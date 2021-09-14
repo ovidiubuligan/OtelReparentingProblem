@@ -33,7 +33,7 @@ namespace Ovidiu
             ResourceBuilder resourceBuilder = ResourceBuilder.CreateDefault ().AddService ("vbus-console");
             builder.SetResourceBuilder (resourceBuilder)
                 .AddSource (_activitySourceName)
-                .SetSampler (new AlwaysOnSampler());// MySampler ());
+                .SetSampler (new MySampler ());
             // builder.AddGrpcCoreInstrumentation ();
             builder.AddHttpClientInstrumentation ();
 
@@ -54,5 +54,17 @@ namespace Ovidiu
 
         }
 
+    }
+
+
+        internal class MySampler : Sampler
+    {
+        public override SamplingResult ShouldSample(in SamplingParameters param)
+        {
+            if (!param.Name.Equals ("reparented")){
+              return new SamplingResult (SamplingDecision.RecordAndSample);
+            }
+            return new SamplingResult (SamplingDecision.Drop);
+        }
     }
 }
